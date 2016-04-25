@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.tony.dao.CityMapper" >
+  <resultMap id="BaseResultMap" type="com.tony.entity.City" >
+    <id column="_city_code" property="cityCode" jdbcType="VARCHAR" />
+    <result column="_en_name" property="enName" jdbcType="VARCHAR" />
+    <result column="_town_name" property="townName" jdbcType="VARCHAR" />
+    <result column="_city_name" property="cityName" jdbcType="VARCHAR" />
+    <result column="_province_name" property="provinceName" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    _city_code, _en_name, _town_name, _city_name, _province_name
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select 
+    <include refid="Base_Column_List" />
+    from citys
+    where _city_code = #{cityCode,jdbcType=VARCHAR}
+  </select>
+  <select id="find" resultMap="BaseResultMap" parameterType="com.tony.entity.City" >
+    select 
+    <include refid="Base_Column_List" />
+    from citys
+    where _town_name = #{townName,jdbcType=VARCHAR} 
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
+    delete from citys
+    where _city_code = #{cityCode,jdbcType=VARCHAR}
+  </delete>
+  <insert id="insert" parameterType="com.tony.entity.City" >
+    insert into citys (_city_code, _en_name, _town_name, 
+      _city_name, _province_name)
+    values (#{cityCode,jdbcType=VARCHAR}, #{enName,jdbcType=VARCHAR}, #{townName,jdbcType=VARCHAR}, 
+      #{cityName,jdbcType=VARCHAR}, #{provinceName,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.tony.entity.City" >
+    insert into citys
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="cityCode != null" >
+        _city_code,
+      </if>
+      <if test="enName != null" >
+        _en_name,
+      </if>
+      <if test="townName != null" >
+        _town_name,
+      </if>
+      <if test="cityName != null" >
+        _city_name,
+      </if>
+      <if test="provinceName != null" >
+        _province_name,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="cityCode != null" >
+        #{cityCode,jdbcType=VARCHAR},
+      </if>
+      <if test="enName != null" >
+        #{enName,jdbcType=VARCHAR},
+      </if>
+      <if test="townName != null" >
+        #{townName,jdbcType=VARCHAR},
+      </if>
+      <if test="cityName != null" >
+        #{cityName,jdbcType=VARCHAR},
+      </if>
+      <if test="provinceName != null" >
+        #{provinceName,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.tony.entity.City" >
+    update citys
+    <set >
+      <if test="enName != null" >
+        _en_name = #{enName,jdbcType=VARCHAR},
+      </if>
+      <if test="townName != null" >
+        _town_name = #{townName,jdbcType=VARCHAR},
+      </if>
+      <if test="cityName != null" >
+        _city_name = #{cityName,jdbcType=VARCHAR},
+      </if>
+      <if test="provinceName != null" >
+        _province_name = #{provinceName,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where _city_code = #{cityCode,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.tony.entity.City" >
+    update citys
+    set _en_name = #{enName,jdbcType=VARCHAR},
+      _town_name = #{townName,jdbcType=VARCHAR},
+      _city_name = #{cityName,jdbcType=VARCHAR},
+      _province_name = #{provinceName,jdbcType=VARCHAR}
+    where _city_code = #{cityCode,jdbcType=VARCHAR}
+  </update>
+  <cache />
+</mapper>
