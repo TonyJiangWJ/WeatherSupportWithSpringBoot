@@ -3,8 +3,8 @@ package com.tony.entity;
 import java.io.Serializable;
 import java.util.Date;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.tony.commons.entity.BaseEntity;
-
 public class Aqi extends BaseEntity<Integer>  {
     private Integer aqiId;
 

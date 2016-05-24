@@ -2,8 +2,8 @@ package com.tony.entity;
 
 import java.io.Serializable;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.tony.commons.entity.BaseEntity;
-
 public class Forecast extends BaseEntity<Integer>  {
     private Integer forecastId;
 

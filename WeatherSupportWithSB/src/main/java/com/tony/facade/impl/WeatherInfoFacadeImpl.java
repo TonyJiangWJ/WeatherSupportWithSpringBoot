@@ -1,5 +1,7 @@
 package com.tony.facade.impl;
 
+import java.util.Date;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +12,8 @@ import org.springframework.util.StringUtils;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.serializer.SerializerFeature;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.tony.commons.DateUtil;
 import com.tony.commons.HttpUtils;
 import com.tony.commons.ResultCodeDesc;
@@ -49,10 +53,12 @@ public class WeatherInfoFacadeImpl implements WeatherInfoFacade{
 	@Autowired
 	private RealtimeService realtimeService;
 	
+	private SerializerFeature[] features ={SerializerFeature.WriteNullNumberAsZero, SerializerFeature.WriteNullStringAsEmpty};
 	private Logger logger = LoggerFactory.getLogger(WeatherInfoFacadeImpl.class); 
 	@Transactional
 	@Override
 	public WeatherInfoResponse getWeather(WeatherInfoRequest request) {
+		
 		WeatherInfoResponse response = new WeatherInfoResponse();
 		response.setResultCode(ResultCodeDesc.ERROR);
 		response.setResultMsg(ResultMessageDesc.ERROR);
@@ -70,8 +76,10 @@ public class WeatherInfoFacadeImpl implements WeatherInfoFacade{
 				targetCity = cityInfoService.findByPrimaryKey(request.getCityCode());
 			}else if(StringUtils.isEmpty(request.getCityEnName())==false){
 				City temp = new City();
+				
 				temp.setEnName(request.getCityEnName());
 				targetCity = cityInfoService.find(temp);
+				logger.info("cityName:{}",targetCity.getCityName());
 			}else{
 				City temp = new City();
 				logger.info("cityName:{}",request.getCityName());
@@ -97,8 +105,8 @@ public class WeatherInfoFacadeImpl implements WeatherInfoFacade{
 				response.setResultCode(ResultCodeDesc.SUCCESS);
 				response.setResultMsg(ResultMessageDesc.SUCCESS);
 				response.setWeatherInfo(result);
+				logger.info("line 80 result:{}",JSON.toJSONString(result));
 			}
-			System.out.println(GetFromHttp(cityCode).toJSONString());
 			
 		}catch(Exception e){
 			e.printStackTrace();
@@ -107,7 +115,7 @@ public class WeatherInfoFacadeImpl implements WeatherInfoFacade{
 		}
 		return response;
 	}
-	
+	@JsonSerialize(include=JsonSerialize.Inclusion.NON_NULL)
 	private JSONObject getWeatherInfo(String cityCode){
 		WeatherInfo temp = new WeatherInfo();
 		temp.setCityCode(cityCode);
@@ -119,46 +127,66 @@ public class WeatherInfoFacadeImpl implements WeatherInfoFacade{
 			return GetFromHttp(cityCode);
 		}
 	}
-	
+	@JsonSerialize(include=JsonSerialize.Inclusion.NON_NULL)
 	private JSONObject GetInfoFromDatabase(String cityCode){
 		WeatherInfo weatherInfo = new WeatherInfo();
 		weatherInfo.setCityCode(cityCode);
 		weatherInfo = weatherService.find(weatherInfo);
 		if(weatherInfo.getWeatherId()!=null){
-			
 			int weatherId = weatherInfo.getWeatherId();
-			Aqi aqi = aqiService.findByWeatherId(weatherId);
-			Day today = dayService.getToday(weatherId);
-			Day yestoday = dayService.getYestoday(weatherId);
-			Forecast forecast = forecastService.findByWeatherId(weatherId);
-			Realtime realtime = realtimeService.findByWeatherId(weatherId);
-			MIndex fs = indexService.getFs(weatherId);
-			MIndex ct = indexService.getCt(weatherId);
-			MIndex ls = indexService.getLs(weatherId);
-			MIndex xc = indexService.getXc(weatherId);
-			MIndex yd = indexService.getYd(weatherId);
-			
-			JSONObject weatherObj = new JSONObject();
-			weatherObj.put("city", weatherInfo.getCityName());
-			weatherObj.put("realtime", JSON.toJSON(realtime));
-			weatherObj.put("forecast", JSON.toJSON(forecast));
-			weatherObj.put("today", JSON.toJSON(today));
-			weatherObj.put("yestoday", JSON.toJSON(yestoday));
-			weatherObj.put("aqi", JSON.toJSON(aqi));
-			JSONArray indexArray2 = new JSONArray();
-			indexArray2.add(JSON.toJSON(fs));
-			indexArray2.add(JSON.toJSON(ls));
-			indexArray2.add(JSON.toJSON(ct));
-			indexArray2.add(JSON.toJSON(yd));
-			indexArray2.add(JSON.toJSON(xc));
-			weatherObj.put("index", indexArray2);
-			logger.info("weatherObj:{}",weatherObj.toJSONString());
-			return weatherObj;
+			Aqi tempAqi = aqiService.findByWeatherId(weatherId);
+			Date dateNow = new Date();
+			Date dateOld = tempAqi.getPubTime();
+			if(DateUtil.HourBetween(dateNow, dateOld)>1){
+				logger.info("更新时间已经超过1小时 hourBetween:{}",DateUtil.HourBetween(dateNow, dateOld));
+				try{
+					return GetFromHttp(cityCode);
+				}catch(Exception e){
+					logger.info("请求超时!");
+					return GetFromDatabase(cityCode);
+				}
+			}else{
+				return GetFromDatabase(cityCode);
+			}
 		}else {
 			return null;
 		}
 	}
-	
+	@JsonSerialize(include=JsonSerialize.Inclusion.NON_NULL)
+	private JSONObject GetFromDatabase(String cityCode){
+		WeatherInfo weatherInfo = new WeatherInfo();
+		weatherInfo.setCityCode(cityCode);
+		weatherInfo = weatherService.find(weatherInfo);
+		int weatherId = weatherInfo.getWeatherId();
+		Aqi aqi = aqiService.findByWeatherId(weatherId);
+		Day today = dayService.getToday(weatherId);
+		Day yestoday = dayService.getYestoday(weatherId);
+		Forecast forecast = forecastService.findByWeatherId(weatherId);
+		Realtime realtime = realtimeService.findByWeatherId(weatherId);
+		MIndex fs = indexService.getFs(weatherId);
+		MIndex ct = indexService.getCt(weatherId);
+		MIndex ls = indexService.getLs(weatherId);
+		MIndex xc = indexService.getXc(weatherId);
+		MIndex yd = indexService.getYd(weatherId);
+		
+		JSONObject weatherObj = new JSONObject();
+		weatherObj.put("city", weatherInfo.getCityName());
+		weatherObj.put("realtime", JSON.toJSON(realtime));
+		weatherObj.put("forecast", JSON.toJSON(forecast));
+		weatherObj.put("today", JSON.toJSON(today));
+		weatherObj.put("yestoday", JSON.toJSON(yestoday));
+		weatherObj.put("aqi", JSON.toJSON(aqi));
+		JSONArray indexArray2 = new JSONArray();
+		indexArray2.add(JSON.toJSON(fs));
+		indexArray2.add(JSON.toJSON(ls));
+		indexArray2.add(JSON.toJSON(ct));
+		indexArray2.add(JSON.toJSON(yd));
+		indexArray2.add(JSON.toJSON(xc));
+		weatherObj.put("index", indexArray2);
+		logger.info("line 186 weatherObj from database:{}",JSON.toJSONString(weatherObj,features));
+		return weatherObj;
+	}
+	@JsonSerialize(include=JsonSerialize.Inclusion.NON_NULL)
 	private JSONObject GetFromHttp(String cityCode){
 		String httpResult = HttpUtils.getInfo(cityCode);
 		logger.info("result from api:{}",httpResult);
@@ -323,7 +351,7 @@ public class WeatherInfoFacadeImpl implements WeatherInfoFacade{
 		indexArray2.add(JSON.toJSON(yd));
 		indexArray2.add(JSON.toJSON(xc));
 		weatherObj.put("index", indexArray2);
-		logger.info("weatherObj:{}",weatherObj.toJSONString());
+		logger.info("line 354 weatherObj from http:{}",JSON.toJSONString(weatherObj,features));
 		return weatherObj;
 		
 	}

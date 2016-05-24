@@ -25,7 +25,7 @@
     from t_index
     where _index_id = #{indexId,jdbcType=INTEGER}
   </select>
-  <select id="selectByWeatherId" resultMap="BaseResultMap" parameterType="java.lang.Integer">
+  <select id="selectByWeatherId" resultMap="ResultMapWithBLOBs" parameterType="java.lang.Integer">
   	select 
   	<include refid="Base_Column_List"/>
   	,
@@ -33,7 +33,7 @@
   	from t_index
   	where _weather_id =#{weatherId,jdbcType=INTEGER}
   </select>
-  <select id="selectListByWeatherId" resultMap="BaseResultMap" parameterType="java.lang.Integer">
+  <select id="selectListByWeatherId" resultMap="ResultMapWithBLOBs" parameterType="java.lang.Integer">
   	select 
   	<include refid="Base_Column_List"/>
   	,

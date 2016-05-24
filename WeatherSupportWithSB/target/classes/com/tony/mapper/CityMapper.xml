@@ -20,8 +20,15 @@
   <select id="find" resultMap="BaseResultMap" parameterType="com.tony.entity.City" >
     select 
     <include refid="Base_Column_List" />
-    from citys
-    where _town_name = #{townName,jdbcType=VARCHAR} 
+    from citys where
+    <trim  suffixOverrides="or" >
+    	<if test="townName!=null">
+    		_town_name = #{townName,jdbcType=VARCHAR} or		
+    	</if>
+      	<if test="enName!=null">
+      		_en_name = #{enName,jdbcType=VARCHAR} or
+      	</if>
+     </trim>
   </select>
   <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
     delete from citys
