@@ -14,12 +14,12 @@ public abstract class BaseWeatherServiceImpl<T extends BaseEntity<E>,E extends S
 	@Override
 	public T findByWeatherId(int weatherId) {
 		// TODO Auto-generated method stub
-		System.out.println("inside findByWeatherId");
+		//System.out.println("inside findByWeatherId");
 		T test = getDao().selectByWeatherId(weatherId);
 		if(test!=null)
-			System.out.println("test:"+JSON.toJSONString(test));
+			;//System.out.println("test:"+JSON.toJSONString(test));
 		else
-			System.out.println("null test");
+			;//System.out.println("null test");
 		return getDao().selectByWeatherId(weatherId);
 	}
 
@@ -34,14 +34,14 @@ public abstract class BaseWeatherServiceImpl<T extends BaseEntity<E>,E extends S
 		}else {
 			if(find(record)!=null)
 			{
-				System.out.println("existed "+JSON.toJSONString(record)+", record:"+JSON.toJSONString(find(record)));
+				//System.out.println("existed "+JSON.toJSONString(record)+", record:"+JSON.toJSONString(find(record)));
 				record.setPrimaryKey(find(record).getPrimaryKey());
 				record.setWeatherId(find(record).getWeatherId());
-				System.out.println(JSON.toJSONString("inside save haha:"+record+" primaryKey:"+record.getPrimaryKey()));
+				//System.out.println(JSON.toJSONString("inside save haha:"+record+" primaryKey:"+record.getPrimaryKey()));
 				return getDao().updateByPrimaryKey(record);	
 			}
 			else{
-				System.out.println("not exist "+JSON.toJSONString(record)+"not exist");
+				//System.out.println("not exist "+JSON.toJSONString(record)+"not exist");
 				return getDao().insert(record);
 			}
 		}

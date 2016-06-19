@@ -33,6 +33,7 @@ public class HttpUtils {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		asyncHttpClient.close();
 		if(result!=null&&!result.equals("")){
 			return result;
 		}else

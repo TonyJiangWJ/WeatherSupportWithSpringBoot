@@ -6,4 +6,6 @@ public class ResultCodeDesc {
 	public static String SYSTEM_ERROR = "99";
 	public static String PARAMS_ERROR = "02";
 	public static String DATA_NOT_EXISTING = "03";
+	public static String USER_ERROR = "04";
+	public static String USER_EXIST = "05";
 }

@@ -16,7 +16,7 @@ public class WeatherInfoResponse extends BaseResponse{
 	private Logger logger = LoggerFactory.getLogger(WeatherInfoResponse.class);
 	
 	public JSONObject getWeatherInfo() {
-		logger.info("WeatherInfo:{}",WeatherInfo.toJSONString());
+//		logger.info("WeatherInfo:{}",WeatherInfo.toJSONString());
 		return WeatherInfo;
 	}
 

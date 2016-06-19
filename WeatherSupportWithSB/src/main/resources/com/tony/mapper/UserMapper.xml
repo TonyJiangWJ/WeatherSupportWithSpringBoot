@@ -25,7 +25,7 @@
     select 
     <include refid="Base_Column_List" />
     from t_user
-    where _username = #{username,jdbcType=VARCHAR}
+    where _username = #{username,jdbcType=VARCHAR} and _password=#{password,jdbcType=VARCHAR}
   </select>
   <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
     delete from t_user

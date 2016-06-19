@@ -1,5 +1,8 @@
 package com.tony.service.impl;
 
+import java.util.List;
+import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,6 +22,12 @@ public class CityInfoServiceImpl extends BaseServiceImpl<String, City> implement
 	protected BaseDao<City, String> getDao() {
 		// TODO Auto-generated method stub
 		return cityDao;
+	}
+
+	@Override
+	public List<City> PageCity(Map<String, Integer> map) {
+		// TODO Auto-generated method stub
+		return cityDao.page(map);
 	}
 	
 	

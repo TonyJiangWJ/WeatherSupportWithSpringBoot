@@ -79,10 +79,10 @@ public class WeatherInfoFacadeImpl implements WeatherInfoFacade{
 				
 				temp.setEnName(request.getCityEnName());
 				targetCity = cityInfoService.find(temp);
-				logger.info("cityName:{}",targetCity.getCityName());
+				//logger.info("cityName:{}",targetCity.getCityName());
 			}else{
 				City temp = new City();
-				logger.info("cityName:{}",request.getCityName());
+				//logger.info("cityName:{}",request.getCityName());
 				temp.setTownName(request.getCityName());
 				targetCity = cityInfoService.find(temp);
 			}
@@ -105,7 +105,7 @@ public class WeatherInfoFacadeImpl implements WeatherInfoFacade{
 				response.setResultCode(ResultCodeDesc.SUCCESS);
 				response.setResultMsg(ResultMessageDesc.SUCCESS);
 				response.setWeatherInfo(result);
-				logger.info("line 80 result:{}",JSON.toJSONString(result));
+				//logger.info("line 80 result:{}",JSON.toJSONString(result));
 			}
 			
 		}catch(Exception e){
@@ -121,7 +121,7 @@ public class WeatherInfoFacadeImpl implements WeatherInfoFacade{
 		temp.setCityCode(cityCode);
 		WeatherInfo oldInfo = weatherService.find(temp);
 		if(oldInfo!=null){
-			logger.info("there is an record in the table:{}",JSON.toJSONString(oldInfo));
+			////logger.info("there is an record in the table:{}",JSON.toJSONString(oldInfo));
 			return GetInfoFromDatabase(cityCode);
 		}else{
 			return GetFromHttp(cityCode);
@@ -138,11 +138,11 @@ public class WeatherInfoFacadeImpl implements WeatherInfoFacade{
 			Date dateNow = new Date();
 			Date dateOld = tempAqi.getPubTime();
 			if(DateUtil.HourBetween(dateNow, dateOld)>1){
-				logger.info("更新时间已经超过1小时 hourBetween:{}",DateUtil.HourBetween(dateNow, dateOld));
+				//logger.info("更新时间已经超过1小时 hourBetween:{}",DateUtil.HourBetween(dateNow, dateOld));
 				try{
 					return GetFromHttp(cityCode);
 				}catch(Exception e){
-					logger.info("请求超时!");
+					//logger.info("请求超时!");
 					return GetFromDatabase(cityCode);
 				}
 			}else{
@@ -183,13 +183,13 @@ public class WeatherInfoFacadeImpl implements WeatherInfoFacade{
 		indexArray2.add(JSON.toJSON(yd));
 		indexArray2.add(JSON.toJSON(xc));
 		weatherObj.put("index", indexArray2);
-		logger.info("line 186 weatherObj from database:{}",JSON.toJSONString(weatherObj,features));
+		//logger.info("line 186 weatherObj from database:{}",JSON.toJSONString(weatherObj,features));
 		return weatherObj;
 	}
 	@JsonSerialize(include=JsonSerialize.Inclusion.NON_NULL)
 	private JSONObject GetFromHttp(String cityCode){
 		String httpResult = HttpUtils.getInfo(cityCode);
-		logger.info("result from api:{}",httpResult);
+		//logger.info("result from api:{}",httpResult);
 		JSONObject resultObj = JSON.parseObject(httpResult);
 		Forecast forecast = new Forecast();
 		Day today = new Day();
@@ -202,6 +202,9 @@ public class WeatherInfoFacadeImpl implements WeatherInfoFacade{
 		MIndex yd = new MIndex();
 		MIndex ct = new MIndex();
 		JSONObject forecastObj = resultObj.getJSONObject("forecast");
+		if(forecastObj==null||forecastObj.isEmpty()){
+			return null;
+		}
 		JSONObject todayObj = resultObj.getJSONObject("today");
 		JSONObject yestodayObj = resultObj.getJSONObject("yestoday");
 		JSONObject realtimeObj = resultObj.getJSONObject("realtime");
@@ -268,10 +271,10 @@ public class WeatherInfoFacadeImpl implements WeatherInfoFacade{
 		weatherInfo.setCityCode(cityCode);
 		weatherInfo.setCityName(cityInfoService.findByPrimaryKey(cityCode).getTownName());
 		weatherService.save(weatherInfo);
-		logger.info("weatherInfo after insert/save:{}",JSON.toJSONString(weatherInfo));
+		//logger.info("weatherInfo after insert/save:{}",JSON.toJSONString(weatherInfo));
 		WeatherInfo weatherInfo2 = weatherService.findByPrimaryKey(19);
-		logger.info("weatherInfo after find:{}",JSON.toJSONString(weatherInfo));
-		logger.info("weatherInfo2 after find:{}",JSON.toJSONString(weatherInfo2));
+		//logger.info("weatherInfo after find:{}",JSON.toJSONString(weatherInfo));
+		//logger.info("weatherInfo2 after find:{}",JSON.toJSONString(weatherInfo2));
 		int weatherId = weatherInfo.getWeatherId();
 		
 		for(int i=0;i<indexArray.size();i++){
@@ -282,7 +285,7 @@ public class WeatherInfoFacadeImpl implements WeatherInfoFacade{
 				fs.setIndex(indexArray.getJSONObject(i).getString("index"));
 				fs.setIndexName(indexArray.getJSONObject(i).getString("name"));
 				fs.setWeatherId(weatherId);
-				logger.info("save fs:{}",JSON.toJSONString(fs));
+				//logger.info("save fs:{}",JSON.toJSONString(fs));
 				indexService.save(fs);
 				break;
 			case "ls":
@@ -291,7 +294,7 @@ public class WeatherInfoFacadeImpl implements WeatherInfoFacade{
 				ls.setIndex(indexArray.getJSONObject(i).getString("index"));
 				ls.setIndexName(indexArray.getJSONObject(i).getString("name"));
 				ls.setWeatherId(weatherId);
-				logger.info("save ls:{}",JSON.toJSONString(ls));
+				//logger.info("save ls:{}",JSON.toJSONString(ls));
 				indexService.save(ls);
 				break;
 			case "ct":
@@ -300,7 +303,7 @@ public class WeatherInfoFacadeImpl implements WeatherInfoFacade{
 				ct.setIndex(indexArray.getJSONObject(i).getString("index"));
 				ct.setIndexName(indexArray.getJSONObject(i).getString("name"));
 				ct.setWeatherId(weatherId);
-				logger.info("save ct:{}",JSON.toJSONString(ct));
+				//logger.info("save ct:{}",JSON.toJSONString(ct));
 				indexService.save(ct);
 				break;
 			case "yd":
@@ -309,7 +312,7 @@ public class WeatherInfoFacadeImpl implements WeatherInfoFacade{
 				yd.setIndex(indexArray.getJSONObject(i).getString("index"));
 				yd.setIndexName(indexArray.getJSONObject(i).getString("name"));
 				yd.setWeatherId(weatherId);
-				logger.info("save yd:{}",JSON.toJSONString(yd));
+				//logger.info("save yd:{}",JSON.toJSONString(yd));
 				indexService.save(yd);
 				break;
 			case "xc":
@@ -318,7 +321,7 @@ public class WeatherInfoFacadeImpl implements WeatherInfoFacade{
 				xc.setIndex(indexArray.getJSONObject(i).getString("index"));
 				xc.setIndexName(indexArray.getJSONObject(i).getString("name"));
 				xc.setWeatherId(weatherId);
-				logger.info("save xc:{}",JSON.toJSONString(xc));
+				//logger.info("save xc:{}",JSON.toJSONString(xc));
 				indexService.save(xc);
 				break;
 			default:
@@ -335,7 +338,7 @@ public class WeatherInfoFacadeImpl implements WeatherInfoFacade{
 		dayService.save(yestoday);
 		aqiService.save(aqi);
 		realtimeService.save(realtime);
-		logger.info("forecast:{} today:{} yestoday:{} aqi:{} realtime:{}",JSON.toJSONString(forecast),JSON.toJSONString(today),JSON.toJSONString(yestoday),JSON.toJSONString(aqi),JSON.toJSONString(realtime));
+		//logger.info("forecast:{} today:{} yestoday:{} aqi:{} realtime:{}",JSON.toJSONString(forecast),JSON.toJSONString(today),JSON.toJSONString(yestoday),JSON.toJSONString(aqi),JSON.toJSONString(realtime));
 		JSONObject weatherObj = new JSONObject();
 		
 		weatherObj.put("city", weatherInfo.getCityName());
@@ -351,9 +354,18 @@ public class WeatherInfoFacadeImpl implements WeatherInfoFacade{
 		indexArray2.add(JSON.toJSON(yd));
 		indexArray2.add(JSON.toJSON(xc));
 		weatherObj.put("index", indexArray2);
-		logger.info("line 354 weatherObj from http:{}",JSON.toJSONString(weatherObj,features));
+		//logger.info("line 354 weatherObj from http:{}",JSON.toJSONString(weatherObj,features));
+		
 		return weatherObj;
 		
+	}
+	@Override
+	public void updateWeather(String cityCode) {
+		// TODO Auto-generated method stub
+		WeatherInfoRequest request = new WeatherInfoRequest();
+		request.setCityCode(cityCode);
+		getWeather(request);
+		//logger.info("update weatherInfo:{}",cityCode);
 	}
 
 }

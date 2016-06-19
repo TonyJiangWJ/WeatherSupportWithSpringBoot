@@ -9,8 +9,15 @@ public class UserRequest extends BaseRequest{
 	private String name;
 	private String phone;
 	private String sex;
+	private String newPassword;
 	
 	
+	public String getNewPassword() {
+		return newPassword;
+	}
+	public void setNewPassword(String newPassword) {
+		this.newPassword = newPassword;
+	}
 	public String getPhone() {
 		return phone;
 	}

@@ -17,12 +17,13 @@ jdbc:
     userServerPrepStmts: true
 
 # SPRING PROFILES
-spring:       
+spring:
     # HTTP ENCODING
     http:
         encoding.charset: UTF-8
         encoding.enable: true
         encoding.force: true
+        
 
 # MyBatis
 mybatis:
